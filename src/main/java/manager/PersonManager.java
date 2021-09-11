@@ -9,10 +9,44 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.swing.text.html.parser.Entity;
 import java.util.List;
 
 public class PersonManager {
     public static void main(String[] args) {
+//        sessionExample();
+        
+        jpaExample();
+    }
+
+    private static void jpaExample() {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistence");
+
+        EntityManager em = emf.createEntityManager();
+
+        em.getTransaction().begin();
+
+        Person p = new Person();
+        p.setFirstName("Алексей");
+        p.setLastName("Федеров");
+        em.persist(p); // как session.save(p)
+
+        Long id = p.getPersonId();
+        System.out.println(id);
+
+        em.getTransaction().commit();
+        em.close();
+
+        em = emf.createEntityManager();
+        List<Person> list = em.createQuery("FROM Person", Person.class).getResultList();
+        list.forEach(System.out::println);
+        em.close();
+    }
+
+    private static void sessionExample() {
         SessionFactory sf = buildSessionFactory();
 
         System.out.println();
